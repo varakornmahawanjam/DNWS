@@ -206,6 +206,31 @@ namespace DNWS
             }
         }
 
+        public static void DeleteUser(string name)
+        {
+            using (var context = new TweetContext())
+            {
+                List<User> user = context.Users.Where(b => b.Name.Equals(name)).ToList();
+                context.Users.Remove(user[0]);
+                context.SaveChanges();
+            }
+        }
+
+        public static List<Following> GetfollowUser(string name)
+        {
+            using (var context = new TweetContext())
+            {
+                try
+                {
+                    List<User> users = context.Users.Where(b => b.Name.Equals(name)).Include(b => b.Following).ToList();
+                    return users[0].Following;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
     }
     public class TwitterPlugin : IPlugin
     {
@@ -273,7 +298,7 @@ namespace DNWS
         }
 
 
-        public HTTPResponse GetResponse(HTTPRequest request)
+        public virtual HTTPResponse GetResponse(HTTPRequest request)
         {
             HTTPResponse response = new HTTPResponse(200);
             StringBuilder sb = new StringBuilder();
